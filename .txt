@@ -1,0 +1,102 @@
+The bot asks who you would like to challenge and would ask you to insert their Discord tag.
+After you put the other player’s discord tag, the bot asks you how much you would like to wager.
+You insert whatever dollar amount
+The bot continues to ask whatever questions are assigned to the game mode that was previously selected from the #wagers channel.
+The bot goes to the challenged player’s dms and sends them all of the supplied info and it tells them if they accept the wager say yes and if they decline the wager say no
+and then if they say yes, the bot finishes asking the second user questions and creates a text channel with the two players and the match host along with each user’s answers to each question
+
+Duels questions:
+1. What is your (team's) IGN(s)?
+2. How much are you looking to wager? This number will be how much you and your opponent are adding to the pot individually. Minimum $.50.
+3. Is this a 1v1, 2v2, or 4v4, etc?
+4. What is your opponent's IGN(s)?
+5. What is your opponent's Discord Tag(s) (Example Deposit#0001)? Make sure to insert their discord tag exactly as shown in the example, with all capitalization correct and no space between the name and tag. If clan battling, just include the tag of the leader.
+6. Which server are you looking to Duel on? Your available options are:
+Minemen
+Hypixel
+PvP Land
+Velt
+Codex
+7. Which mode would you like to duel in? Your available options are:
+Minemen
+NoDebuff
+Sumo
+Build UHC
+Combo
+Classic
+Spleef
+Hypixel
+UHC
+Bridge
+Classic
+SkyWars
+PvP Land
+NoDebuff
+Build UHC
+Velt
+NoDebuff
+Build UHC
+Parkour
+Codex
+Hub Duels
+8. When would you like for this duel to take place? (Time, time zone, date)
+9. Are you ready to submit? Is there any extra info you'd like to add?
+
+Survival Games questions:
+1. What is your (team's) IGN(s)?
+2. How much are you looking to wager? This number will be how much you and your opponent are adding to the pot individually. Minimum $.50.
+3. Is this a 1v1, 2v2, or 4v4, etc?
+4. What is your opponent's IGN(s)?
+5. What is your opponent's Discord Tag(s) (Example Deposit#0001)? Make sure to insert their discord tag exactly as shown in the example, with all capitalization correct and no space between the name and tag. If clan battling, just include the tag of the leader.
+6. Which server are you looking to Duel on? Your available options are:
+MC Central
+Backplay
+MCSG
+Mineplex
+7. Which type of duel would you like to have?
+MC Central
+Direct 1v1/Clan Battle (win-based)
+Pub smash 1v1/Clan Battle (point-based)
+Backplay
+Direct 1v1
+Clan Battle
+MCSG
+Direct 1v1
+Clan Battle
+Mineplex
+Direct 1v1/Clan Battle (win-based)
+Pub smash 1v1/Clan Battle (point-based)
+
+
+Skywars questions:
+1. What is your (team's) IGN(s)?
+2. How much are you looking to wager? This number will be how much you and your opponent are adding to the pot individually. Minimum $.50.
+3. Is this a 1v1, 2v2, or 4v4, etc?
+4. What is your opponent's IGN(s)?
+5. What is your opponent's Discord Tag(s) (Example Deposit#0001)? Make sure to insert their discord tag exactly as shown in the example, with all capitalization correct and no space between the name and tag.
+6. Which server are you looking to Duel on? Your available options are:
+Hypixel
+Mineplex
+7. Which type of duel would you like to have?
+Hypixel
+Direct 1v1/Clan Battle (win-based)
+Pub smash 1v1/Clan Battle (point-based)
+Mineplex
+Direct 1v1/Clan Battle (win-based)
+Pub smash 1v1/Clan Battle (point-based)
+8. When would you like for this duel to take place? (Time, time zone, date)
+9. Are you ready to submit? Is there any extra info you'd like to add?
+
+Bedwars questions:
+1. What is your (team's) IGN(s)?
+2. How much are you looking to wager? This number will be how much you and your opponent are adding to the pot individually. Minimum $.50.
+3. Is this a 1v1, 2v2, or 4v4, etc?
+4. What is your opponent's IGN(s)?
+5. What is your opponent's Discord Tag(s) (Example Deposit#0001)? Make sure to insert their discord tag exactly as shown in the example, with all capitalization correct and no space between the name and tag. If clan battling, just include the tag of the leader.
+6. Which server are you looking to Duel on? Your available options are:
+Hypixel
+7. Which type of duel would you like to have?
+Direct 1v1/Clan Battle (win-based)
+Pub smash 1v1/Clan Battle (point-based)
+8. When would you like for this duel to take place? (Time, time zone, date)
+9. Are you ready to submit? Is there any extra info you'd like to add?
