@@ -10,22 +10,7 @@ module.exports = async(client, reaction, user) => {
 
     let config = JSON.parse(fs.readFileSync(`./config.json`));
 
-    function size() {
-        let amount;
-
-        if(config.opened <= 10) {
-            amount = `000${config.opened++}`
-        } else if(config.opened <= 100) {
-            amount = `00${config.opened++}`
-        } else if(config.opened <= 1000) {
-            amount = `0${config.opened++}`
-        } else {
-            amount = `${config.opened++}`
-        }
-
-        fs.writeFileSync(`./config.json`, JSON.stringify(config));
-        return amount;
-    }
+    await user.createDM();
 
     if(reaction.emoji.name === "1️⃣") {
         reaction.users.remove(user);
@@ -46,7 +31,7 @@ module.exports = async(client, reaction, user) => {
             // Second Collector
             let collector = user.dmChannel.createMessageCollector(m => m.author.id === user.id, { max: 1 });
             collector.on('collect', m => {
-                let amount = parseInt(m.content);
+                let amount = m.content;
 
                 // Third Question
                 embed.setDescription(`3. Is this a 1v1, 2v2, or 4v4, etc?`)
@@ -55,7 +40,7 @@ module.exports = async(client, reaction, user) => {
                 // Third Collector
                 let collector = user.dmChannel.createMessageCollector(m => m.author.id === user.id && ['1v1', '2v2', '3v3', '4v4'].includes(m.content.toLowerCase()), { max: 1 });
                 collector.on('collect', m => {
-                    let size = m.content;
+                    let teamsize = m.content;
 
                     // Fourth Question
                     embed.setDescription(`4. What is your opponent's IGN(s)?`)
@@ -74,6 +59,7 @@ module.exports = async(client, reaction, user) => {
                         let collector = user.dmChannel.createMessageCollector(m => m.author.id === user.id, { max: 1 });
                         collector.on('collect', m => {
                             let opponent = client.users.cache.find(x => x.tag === m.content);
+                            let oppMember = message.guild.members.cache.get(opponent.id);
                             if(!opponent) return user.send(`🚫 No User Found! Please try again...`);
                             if(opponent.tag === user.tag) return user.send(`🚫 You cannot play yourself! Please try again...`);
 
@@ -132,7 +118,7 @@ module.exports = async(client, reaction, user) => {
                                             .setThumbnail(user.displayAvatarURL())
                                             .addField(`Team/IGN`, team, true)
                                             .addField(`Wager`, amount, true)
-                                            .addField(`Team Size`, size, true)
+                                            .addField(`Team Size`, teamsize, true)
                                             .addField(`Oponent IGN`, opponentIGN, true)
                                             .addField(`Opponent`, opponent, true)
                                             .addField(`Server`, server, true)
@@ -141,20 +127,35 @@ module.exports = async(client, reaction, user) => {
                                             .addField(`Extra`, extra, true)
                                             .setFooter(user.id);
 
-                                            let msg = await opponent.send(finalEmbed).then(a => {
-                                                a.react('✅');
-                                                a.react('🚫');
-                                            })
-                                            .catch(e => user.send(`🚫 User has their DM's closed! We cannot request a match from him.`));
+                                            let msg = await opponent.send(finalEmbed);
+                                            msg.react('✅'); msg.react('🚫');
+                                            
+                                            function size() {
+                                                let amount;
+                                        
+                                                if(config.opened <= 10) {
+                                                    amount = `000${config.opened++}`
+                                                } else if(config.opened <= 100) {
+                                                    amount = `00${config.opened++}`
+                                                } else if(config.opened <= 1000) {
+                                                    amount = `0${config.opened++}`
+                                                } else {
+                                                    amount = `${config.opened++}`
+                                                }
+                                        
+                                                fs.writeFileSync(`./config.json`, JSON.stringify(config));
+                                                return amount;
+                                            }
 
-                                            let eCollector = msg.createReactionCollector((reaction, u) => ["✅", "🚫"].includes(reaction.emoji.name), { max: 1 });
-                                            eCollector.on('collect', async(reaction, user) => {
+                                            let eCollector = msg.createReactionCollector((reaction, u) => u.id === opponent.id && ["✅", "🚫"].includes(reaction.emoji.name), { max: 1 });
+                                            eCollector.on('collect', async(reaction, u) => {
                                                 let chan = await message.guild.channels.create(`${size()}-${user.username}-${opponent.username}`, {type: "text"});
                                                 chan.createOverwrite(message.guild.id, {VIEW_CHANNEL: false, SEND_MESSAGES: false})
                                                 chan.createOverwrite(opponent, {VIEW_CHANNEL: true, SEND_MESSAGES: true});
                                                 chan.createOverwrite(user, {VIEW_CHANNEL: true, SEND_MESSAGES: true});
+                                                chan.setParent(client.config.wager.category);
                                         
-                                                chan.send(`${user} ${opponent}`).then(a => a.delete({timeout: 1000}));
+                                                chan.send(`${user} ${oppMember}`).then(a => a.delete({timeout: 1000}));
                                                 chan.send(finalEmbed);
                                             });
                                         });                                           
@@ -187,7 +188,7 @@ module.exports = async(client, reaction, user) => {
             // Second Collector
             let collector = user.dmChannel.createMessageCollector(m => m.author.id === user.id, { max: 1 });
             collector.on('collect', m => {
-                let amount = parseInt(m.content);
+                let amount = m.content;
 
                 // Third Question
                 embed.setDescription(`3. Is this a 1v1, 2v2, or 4v4, etc?`)
@@ -196,7 +197,7 @@ module.exports = async(client, reaction, user) => {
                 // Third Collector
                 let collector = user.dmChannel.createMessageCollector(m => m.author.id === user.id && ['1v1', '2v2', '3v3', '4v4'].includes(m.content.toLowerCase()), { max: 1 });
                 collector.on('collect', m => {
-                    let size = m.content;
+                    let teamsize = m.content;
 
                     // Fourth Question
                     embed.setDescription(`4. What is your opponent's IGN(s)?`)
@@ -215,6 +216,7 @@ module.exports = async(client, reaction, user) => {
                         let collector = user.dmChannel.createMessageCollector(m => m.author.id === user.id, { max: 1 });
                         collector.on('collect', m => {
                             let opponent = client.users.cache.find(x => x.tag === m.content);
+                            let oppMember = message.guild.members.cache.get(opponent.id);
                             if(!opponent) return user.send(`🚫 No User Found! Please try again...`);
                             if(opponent.tag === user.tag) return user.send(`🚫 You cannot play yourself! Please try again...`);
 
@@ -272,7 +274,7 @@ module.exports = async(client, reaction, user) => {
                                             .setThumbnail(user.displayAvatarURL())
                                             .addField(`Team/IGN`, team, true)
                                             .addField(`Wager`, amount, true)
-                                            .addField(`Team Size`, size, true)
+                                            .addField(`Team Size`, teamsize, true)
                                             .addField(`Oponent IGN`, opponentIGN, true)
                                             .addField(`Opponent`, opponent, true)
                                             .addField(`Server`, server, true)
@@ -281,20 +283,35 @@ module.exports = async(client, reaction, user) => {
                                             .addField(`Extra`, extra, true)
                                             .setFooter(user.id);
 
-                                            let msg = await opponent.send(finalEmbed).then(a => {
-                                                a.react('✅');
-                                                a.react('🚫');
-                                            })
-                                            .catch(e => user.send(`🚫 User has their DM's closed! We cannot request a match from him.`));
+                                            let msg = await opponent.send(finalEmbed);
+                                            msg.react('✅'); msg.react('🚫');
 
-                                            let eCollector = msg.createReactionCollector((reaction, u) => ["✅", "🚫"].includes(reaction.emoji.name), { max: 1 });
-                                            eCollector.on('collect', async(reaction, user) => {
+                                            function size() {
+                                                let amount;
+                                        
+                                                if(config.opened <= 10) {
+                                                    amount = `000${config.opened++}`
+                                                } else if(config.opened <= 100) {
+                                                    amount = `00${config.opened++}`
+                                                } else if(config.opened <= 1000) {
+                                                    amount = `0${config.opened++}`
+                                                } else {
+                                                    amount = `${config.opened++}`
+                                                }
+                                        
+                                                fs.writeFileSync(`./config.json`, JSON.stringify(config));
+                                                return amount;
+                                            }
+
+                                            let eCollector = msg.createReactionCollector((reaction, u) => u.id === opponent.id && ["✅", "🚫"].includes(reaction.emoji.name), { max: 1 });
+                                            eCollector.on('collect', async(reaction, u) => {
                                                 let chan = await message.guild.channels.create(`${size()}-${user.username}-${opponent.username}`, {type: "text"});
                                                 chan.createOverwrite(message.guild.id, {VIEW_CHANNEL: false, SEND_MESSAGES: false})
                                                 chan.createOverwrite(opponent, {VIEW_CHANNEL: true, SEND_MESSAGES: true});
                                                 chan.createOverwrite(user, {VIEW_CHANNEL: true, SEND_MESSAGES: true});
+                                                chan.setParent(client.config.wager.category);
                                         
-                                                chan.send(`${user} ${opponent}`).then(a => a.delete({timeout: 1000}));
+                                                chan.send(`${user} ${oppMember}`).then(a => a.delete({timeout: 1000}));
                                                 chan.send(finalEmbed);
                                             });
                                         });                                           
@@ -327,7 +344,7 @@ module.exports = async(client, reaction, user) => {
             // Second Collector
             let collector = user.dmChannel.createMessageCollector(m => m.author.id === user.id, { max: 1 });
             collector.on('collect', m => {
-                let amount = parseInt(m.content);
+                let amount = m.content;
 
                 // Third Question
                 embed.setDescription(`3. Is this a 1v1, 2v2, or 4v4, etc?`)
@@ -336,7 +353,7 @@ module.exports = async(client, reaction, user) => {
                 // Third Collector
                 let collector = user.dmChannel.createMessageCollector(m => m.author.id === user.id && ['1v1', '2v2', '3v3', '4v4'].includes(m.content.toLowerCase()), { max: 1 });
                 collector.on('collect', m => {
-                    let size = m.content;
+                    let teamsize = m.content;
 
                     // Fourth Question
                     embed.setDescription(`4. What is your opponent's IGN(s)?`)
@@ -355,6 +372,7 @@ module.exports = async(client, reaction, user) => {
                         let collector = user.dmChannel.createMessageCollector(m => m.author.id === user.id, { max: 1 });
                         collector.on('collect', m => {
                             let opponent = client.users.cache.find(x => x.tag === m.content);
+                            let oppMember = message.guild.members.cache.get(opponent.id);
                             if(!opponent) return user.send(`🚫 No User Found! Please try again...`);
                             if(opponent.tag === user.tag) return user.send(`🚫 You cannot play yourself! Please try again...`);
 
@@ -410,7 +428,7 @@ module.exports = async(client, reaction, user) => {
                                             .setThumbnail(user.displayAvatarURL())
                                             .addField(`Team/IGN`, team, true)
                                             .addField(`Wager`, amount, true)
-                                            .addField(`Team Size`, size, true)
+                                            .addField(`Team Size`, teamsize, true)
                                             .addField(`Oponent IGN`, opponentIGN, true)
                                             .addField(`Opponent`, opponent, true)
                                             .addField(`Server`, server, true)
@@ -419,20 +437,35 @@ module.exports = async(client, reaction, user) => {
                                             .addField(`Extra`, extra, true)
                                             .setFooter(user.id);
 
-                                            let msg = await opponent.send(finalEmbed).then(a => {
-                                                a.react('✅');
-                                                a.react('🚫');
-                                            })
-                                            .catch(e => user.send(`🚫 User has their DM's closed! We cannot request a match from him.`));
+                                            let msg = await opponent.send(finalEmbed);
+                                            msg.react('✅'); msg.react('🚫');
 
-                                            let eCollector = msg.createReactionCollector((reaction, u) => ["✅", "🚫"].includes(reaction.emoji.name), { max: 1 });
-                                            eCollector.on('collect', async(reaction, user) => {
+                                            function size() {
+                                                let amount;
+                                        
+                                                if(config.opened <= 10) {
+                                                    amount = `000${config.opened++}`
+                                                } else if(config.opened <= 100) {
+                                                    amount = `00${config.opened++}`
+                                                } else if(config.opened <= 1000) {
+                                                    amount = `0${config.opened++}`
+                                                } else {
+                                                    amount = `${config.opened++}`
+                                                }
+                                        
+                                                fs.writeFileSync(`./config.json`, JSON.stringify(config));
+                                                return amount;
+                                            }
+
+                                            let eCollector = msg.createReactionCollector((reaction, u) => u.id === opponent.id && ["✅", "🚫"].includes(reaction.emoji.name), { max: 1 });
+                                            eCollector.on('collect', async(reaction, u) => {
                                                 let chan = await message.guild.channels.create(`${size()}-${user.username}-${opponent.username}`, {type: "text"});
                                                 chan.createOverwrite(message.guild.id, {VIEW_CHANNEL: false, SEND_MESSAGES: false})
                                                 chan.createOverwrite(opponent, {VIEW_CHANNEL: true, SEND_MESSAGES: true});
                                                 chan.createOverwrite(user, {VIEW_CHANNEL: true, SEND_MESSAGES: true});
+                                                chan.setParent(client.config.wager.category);
                                         
-                                                chan.send(`${user} ${opponent}`).then(a => a.delete({timeout: 1000}));
+                                                chan.send(`${user} ${oppMember}`).then(a => a.delete({timeout: 1000}));
                                                 chan.send(finalEmbed);
                                             });
                                         });                                           
@@ -465,7 +498,7 @@ module.exports = async(client, reaction, user) => {
             // Second Collector
             let collector = user.dmChannel.createMessageCollector(m => m.author.id === user.id, { max: 1 });
             collector.on('collect', m => {
-                let amount = parseInt(m.content);
+                let amount = m.content;
 
                 // Third Question
                 embed.setDescription(`3. Is this a 1v1, 2v2, or 4v4, etc?`)
@@ -474,7 +507,7 @@ module.exports = async(client, reaction, user) => {
                 // Third Collector
                 let collector = user.dmChannel.createMessageCollector(m => m.author.id === user.id && ['1v1', '2v2', '3v3', '4v4'].includes(m.content.toLowerCase()), { max: 1 });
                 collector.on('collect', m => {
-                    let size = m.content;
+                    let teamsize = m.content;
 
                     // Fourth Question
                     embed.setDescription(`4. What is your opponent's IGN(s)?`)
@@ -493,6 +526,7 @@ module.exports = async(client, reaction, user) => {
                         let collector = user.dmChannel.createMessageCollector(m => m.author.id === user.id, { max: 1 });
                         collector.on('collect', m => {
                             let opponent = client.users.cache.find(x => x.tag === m.content);
+                            let oppMember = message.guild.members.cache.get(opponent.id);
                             if(!opponent) return user.send(`🚫 No User Found! Please try again...`);
                             if(opponent.tag === user.tag) return user.send(`🚫 You cannot play yourself! Please try again...`);
 
@@ -539,7 +573,7 @@ module.exports = async(client, reaction, user) => {
                                             .setThumbnail(user.displayAvatarURL())
                                             .addField(`Team/IGN`, team, true)
                                             .addField(`Wager`, amount, true)
-                                            .addField(`Team Size`, size, true)
+                                            .addField(`Team Size`, teamsize, true)
                                             .addField(`Oponent IGN`, opponentIGN, true)
                                             .addField(`Opponent`, opponent, true)
                                             .addField(`Server`, server, true)
@@ -547,20 +581,35 @@ module.exports = async(client, reaction, user) => {
                                             .addField(`Time`, time, true)
                                             .addField(`Extra`, extra, true)
 
-                                            let msg = await opponent.send(finalEmbed).then(a => {
-                                                a.react('✅');
-                                                a.react('🚫');
-                                            })
-                                            .catch(e => user.send(`🚫 User has their DM's closed! We cannot request a match from him.`));
+                                            let msg = await opponent.send(finalEmbed);
+                                            msg.react('✅'); msg.react('🚫');
+                                            
+                                            function size() {
+                                                let amount;
+                                        
+                                                if(config.opened <= 10) {
+                                                    amount = `000${config.opened++}`
+                                                } else if(config.opened <= 100) {
+                                                    amount = `00${config.opened++}`
+                                                } else if(config.opened <= 1000) {
+                                                    amount = `0${config.opened++}`
+                                                } else {
+                                                    amount = `${config.opened++}`
+                                                }
+                                        
+                                                fs.writeFileSync(`./config.json`, JSON.stringify(config));
+                                                return amount;
+                                            }
 
-                                            let eCollector = msg.createReactionCollector((reaction, u) => ["✅", "🚫"].includes(reaction.emoji.name), { max: 1 });
-                                            eCollector.on('collect', async(reaction, user) => {
+                                            let eCollector = msg.createReactionCollector((reaction, u) => u.id === opponent.id && ["✅", "🚫"].includes(reaction.emoji.name), { max: 1 });
+                                            eCollector.on('collect', async(reaction, u) => {
                                                 let chan = await message.guild.channels.create(`${size()}-${user.username}-${opponent.username}`, {type: "text"});
                                                 chan.createOverwrite(message.guild.id, {VIEW_CHANNEL: false, SEND_MESSAGES: false})
                                                 chan.createOverwrite(opponent, {VIEW_CHANNEL: true, SEND_MESSAGES: true});
                                                 chan.createOverwrite(user, {VIEW_CHANNEL: true, SEND_MESSAGES: true});
+                                                chan.setParent(client.config.wager.category);
                                         
-                                                chan.send(`${user} ${opponent}`).then(a => a.delete({timeout: 1000}));
+                                                chan.send(`${user} ${oppMember}`).then(a => a.delete({timeout: 1000}));
                                                 chan.send(finalEmbed);
                                             });
                                         });                                           
